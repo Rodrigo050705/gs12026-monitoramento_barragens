@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  # 1. Banco de Dados da Bia
+  database:
+    image: postgres:15-alpine
+    container_name: dam_monitor_db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: dam_password_2026
+      POSTGRES_DB: dam_monitor_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # Se a Bia colocar o script SQL na pasta ./init, o Postgres executa automaticamente ao iniciar
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - dam_network
+
+  # 2. Broker MQTT para o simulador IoT do Rodrigo
+  mqtt-broker:
+    image: eclipse-mosquitto:2.0
+    container_name: dam_monitor_mqtt
+    ports:
+      - "1883:1883" # Porta padrão para o simulador enviar dados
+      - "9001:9001" # Porta para WebSockets (se o Front quiser ouvir direto)
+    volumes:
+      - mosquitto_data:/mosquitto/data
+    networks:
+      - dam_network
+
+  # 3. Sistema de Mensageria / Fila do Matheus (Arquitetura Distribuída)
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: dam_monitor_queue
+    ports:
+      - "5672:5672"   # Porta de comunicação da API/Worker com a fila
+      - "15672:15672" # Painel Web para o Matheus e o Dionísio gerenciarem as filas
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - dam_network
+
+volumes:
+  postgres_data:
+  mosquitto_data:
+
+networks:
+  dam_network:
+    driver: bridge
