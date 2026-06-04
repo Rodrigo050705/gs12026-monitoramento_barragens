@@ -22,6 +22,8 @@ services:
   mqtt-broker:
     image: eclipse-mosquitto:2.0
     container_name: dam_monitor_mqtt
+    # ADICIONE A LINHA ABAIXO PARA LIBERAR O ACESSO SEM SENHA LOCAL:
+    command: mosquitto -c /mosquitto-no-auth.conf
     ports:
       - "1883:1883" # Porta padrão para o simulador enviar dados
       - "9001:9001" # Porta para WebSockets (se o Front quiser ouvir direto)
