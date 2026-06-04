@@ -76,6 +76,8 @@ CREATE TABLE alertas (
 -- ============================================
 -- INSERTS DE TESTE
 -- ============================================
+-- INSERTS DE TESTE CORRIGIDOS (Alinhados com o Simulador)
+-- ============================================
 
 INSERT INTO usuarios
 (nome, email, senha_hash, role)
@@ -86,23 +88,21 @@ VALUES
 INSERT INTO barragens
 (nome, localizacao, nivel_critico_metros)
 VALUES
-('Barragem Sul', 'Minas Gerais', 18.00),
-('Barragem Norte', 'Pará', 20.00);
+('Barragem Sul', 'Minas Gerais', 25.00),
+('Barragem Norte', 'Pará', 28.00);
 
 INSERT INTO sensores
 (codigo_identificador, tipo, limite_alerta, barragem_id)
 VALUES
-('PZ001', 'PIEZOMETRO', 15.00, 1),
-('NV001', 'NIVEL_AGUA', 18.00, 1),
-('PZ002', 'PIEZOMETRO', 16.00, 2);
+('PIEZ-BRG01-04', 'piezometro', 170.00, 1), -- Limite em kPa
+('NIVL-BRG01-01', 'nivel', 23.00, 1);       -- Limite em Metros
 
+-- Como mudamos os IDs acima, vinculamos as leituras iniciais aos IDs gerados (1 e 2)
 INSERT INTO leituras
 (sensor_id, timestamp, valor_leitura)
 VALUES
-(1, CURRENT_TIMESTAMP, 12.50),
-(1, CURRENT_TIMESTAMP, 13.20),
-(2, CURRENT_TIMESTAMP, 17.40),
-(3, CURRENT_TIMESTAMP, 15.90);
+(1, CURRENT_TIMESTAMP, 142.50),
+(2, CURRENT_TIMESTAMP, 22.15);
 
 INSERT INTO alertas
 (sensor_id, mensagem, timestamp, status)
@@ -110,12 +110,6 @@ VALUES
 (
     2,
     'Nível da água próximo do limite crítico',
-    CURRENT_TIMESTAMP,
-    'ATIVO'
-),
-(
-    3,
-    'Pressão acima do limite configurado',
     CURRENT_TIMESTAMP,
     'ATIVO'
 );
