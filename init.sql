@@ -108,11 +108,18 @@ INSERT INTO alertas
 (sensor_id, mensagem, timestamp, status)
 VALUES
 (
-    2,
+    1, -- Aponta para o Piezômetro (id 1)
+    'Pressão nos poros do solo acima do limite configurado',
+    CURRENT_TIMESTAMP,
+    'ATIVO'
+),
+(
+    2, -- Aponta para o Sensor de Nível (id 2)
     'Nível da água próximo do limite crítico',
     CURRENT_TIMESTAMP,
     'ATIVO'
 );
+
 
 -- ============================================
 -- CONSULTAS DE DEMONSTRAÇÃO
