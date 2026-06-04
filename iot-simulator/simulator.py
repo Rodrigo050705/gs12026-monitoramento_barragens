@@ -25,12 +25,14 @@ except Exception as e:
 print("🚀 Simulador do Dam Monitor iniciado. Pressione Ctrl+C para parar.\n")
 
 # Variável de tempo para criar a onda suave (senoide)
-contador = 0
+contador_ondas = 0
+ciclo_atual = 0  # <--- Nova variável para contar os passos
 
 while True:
     try:
         # 1. GERAÇÃO DE DADOS SIMULADOS (Com comportamento real)
-        contador += 0.1
+        contador_ondas += 0.1
+        ciclo_atual += 1  # Incrementa 1 a cada 5 segundos
         timestamp_atual = datetime.now(timezone.utc).isoformat()
         
         # --- Simulação do Piezômetro ---
@@ -46,7 +48,7 @@ while True:
         forçar_alerta = random.randint(1, 50) == 25
         if forçar_alerta:
             print("\n🚨 [SIMULADOR] Injetando uma anomalia crítica para teste de estresse!")
-            pressao_base += 45.0  # Vai saltar para quase 190 kPa (Crítico)
+            pressao_base += 45.0  # Vai saltar para quase 180 kPa (Crítico)
             nivel_base += 8.0     # Vai saltar para 30 metros (Crítico)
 
         # 2. MONTAGEM DOS PAYLOADS JSON (Conforme o contrato que alinhamos)
