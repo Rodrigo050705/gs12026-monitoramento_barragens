@@ -1,6 +1,24 @@
-version: '3.8'
-
 services:
+  api:
+    build:
+      context: ./back-end
+      dockerfile: DamMonitor.Host/Dockerfile
+    container_name: dam_monitor_api
+    depends_on:
+      - database
+      - rabbitmq
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__Postgres: Host=database;Port=5432;Database=dam_monitor_db;Username=admin;Password=dam_password_2026
+      RabbitMq__ConnectionString: amqp://guest:guest@rabbitmq:5672
+      Rebus__QueueName: sensor-readings
+      Mqtt__Host: mqtt-broker
+      Mqtt__Port: 1883
+    ports:
+      - "8080:8080"
+    networks:
+      - dam_network
+
   # 1. Banco de Dados da Bia
   database:
     image: postgres:15-alpine
@@ -22,17 +40,35 @@ services:
   mqtt-broker:
     image: eclipse-mosquitto:2.0
     container_name: dam_monitor_mqtt
-    # ADICIONE A LINHA ABAIXO PARA LIBERAR O ACESSO SEM SENHA LOCAL:
-    command: mosquitto -c /mosquitto-no-auth.conf
+    command: mosquitto -c /mosquitto/config/mosquitto.conf
     ports:
       - "1883:1883" # Porta padrão para o simulador enviar dados
       - "9001:9001" # Porta para WebSockets (se o Front quiser ouvir direto)
     volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
       - mosquitto_data:/mosquitto/data
     networks:
       - dam_network
 
-  # 3. Sistema de Mensageria / Fila do Matheus (Arquitetura Distribuída)
+  # 3. Simulador IoT do Rodrigo publicando leituras via MQTT
+  iot-simulator:
+    build:
+      context: ./iot-simulator
+      dockerfile: Dockerfile
+    container_name: dam_monitor_iot_simulator
+    depends_on:
+      - api
+      - mqtt-broker
+    environment:
+      MQTT_BROKER: mqtt-broker
+      MQTT_PORT: 1883
+      PYTHONUNBUFFERED: 1
+    networks:
+      - dam_network
+    profiles:
+      - simulator
+
+  # 4. Sistema de Mensageria / Fila do Matheus (Arquitetura Distribuída)
   rabbitmq:
     image: rabbitmq:3-management-alpine
     container_name: dam_monitor_queue

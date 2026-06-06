@@ -1,13 +1,14 @@
 import time
 import json
 import math
+import os
 import random
 import paho.mqtt.client as mqtt
 from datetime import datetime, timezone
 
 # --- CONFIGURAÇÕES ---
-BROKER = "localhost"
-PORT = 1883
+BROKER = os.getenv("MQTT_BROKER", "localhost")
+PORT = int(os.getenv("MQTT_PORT", "1883"))
 TOPICO_PIEZOMETRO = "barragens/sensor/piezometro"
 TOPICO_NIVEL = "barragens/sensor/nivel"
 
@@ -16,13 +17,17 @@ client = mqtt.Client(callback_api_version=mqtt.CallbackAPIVersion.VERSION2)
 
 try:
     client.connect(BROKER, PORT, 60)
+    client.loop_start()
     print(f"✅ Conectado ao Broker MQTT em {BROKER}:{PORT}")
 except Exception as e:
     print(f"❌ Erro ao conectar ao Broker: {e}")
     print("Certifique-se de que o container do Docker (mosquitto) está rodando.")
     exit(1)
 
-# ... (mantenha as configurações iniciais e o client.connect)
+def enviar_payload(topico, payload):
+    result = client.publish(topico, json.dumps(payload))
+    if result.rc != mqtt.MQTT_ERR_SUCCESS:
+        print(f"⚠️ Falha ao publicar no tópico {topico}: código {result.rc}")
 
 print("🚀 Simulador do Dam Monitor iniciado. Pressione Ctrl+C para parar.\n")
 
@@ -70,8 +75,8 @@ while True:
         }
 
         # --- ENVIO DOS DADOS ---
-        client.publish(TOPICO_PIEZOMETRO, json.dumps(payload_piezometro))
-        client.publish(TOPICO_NIVEL, json.dumps(payload_nivel))
+        enviar_payload(TOPICO_PIEZOMETRO, payload_piezometro)
+        enviar_payload(TOPICO_NIVEL, payload_nivel)
 
         # Logs no console
         print(f"[{datetime.now().strftime('%H:%M:%S')}] 📡 Dado enviado (Ciclo #{ciclo_atual}):")
@@ -85,5 +90,6 @@ while True:
 
     except KeyboardInterrupt:
         print("\n👋 Simulador encerrado pelo usuário.")
+        client.loop_stop()
         client.disconnect()
         break
