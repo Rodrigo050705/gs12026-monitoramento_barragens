@@ -1,1 +1,36 @@
+# Build outputs
+bin/
+obj/
+**/bin/
+**/obj/
+
+# IDE/editor files
+.idea/
+**/.idea/
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Local configuration and secrets
+*.Development.json.user
+*.local.json
+.env
+.env.*
+!.env.example
+
+# Docker/local volumes
 postgres_data/
+mosquitto_data/
+*.db
+*.sqlite
+
+# OS files
+Thumbs.db
+Desktop.ini
+
+# Python cache
+__pycache__/
+**/__pycache__/
+*.pyc

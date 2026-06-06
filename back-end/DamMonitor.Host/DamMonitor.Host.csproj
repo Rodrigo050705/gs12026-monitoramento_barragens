@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\DamMonitor.Domain\DamMonitor.Domain.csproj" />
+        <ProjectReference Include="..\DamMonitor.Infrastructure\DamMonitor.Infrastructure.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.8" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.7" />
+        <PackageReference Include="MQTTnet" Version="5.1.0.1559" />
+        <PackageReference Include="Rebus.RabbitMq" Version="10.1.1" />
+        <PackageReference Include="Rebus.ServiceProvider" Version="10.7.2" />
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.19.1" />
+    </ItemGroup>
+
+</Project>
